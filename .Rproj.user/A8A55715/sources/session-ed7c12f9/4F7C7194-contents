@@ -5,6 +5,23 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+```{r}
+winners <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-04-25/winners.csv')
+```
+
+```{r}
+winners %>%
+  filter(!grepl('Wheelchair', Category)) -> WinnersTidy
+```
+
+ #`!grepl` called within the filter function will filter out any rows that contain a specific string within the category column in this example.
+
+```{r}
+
 ```
 
 
