@@ -6,6 +6,9 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(ggflags)
+library(countrycode)
+library(tidytext)
 ```
 
 
@@ -14,14 +17,58 @@ winners <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/ti
 ```
 
 ```{r}
-winners %>%
-  filter(!grepl('Wheelchair', Category)) -> WinnersTidy
+WinnersTidy <- winners %>%
+  filter(!grepl('Wheelchair', Category)) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'United States' , 'us')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Norway' , 'no')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'United Kingdom' , 'gb')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Japan' , 'jp')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Denmark' , 'dk')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Kenya' , 'ke')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Soviet Union' , 'su')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Portugal' , 'pt')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Mexico' , 'mx')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Spain' , 'es')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Morocco' , 'ma')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Ethiopia' , 'et')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Poland' , 'pl')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Germany' , 'de')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Ireland' , 'ie')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'China' , 'cn'))
+  
+
+WinnersTidy
 ```
 
  #`!grepl` called within the filter function will filter out any rows that contain a specific string within the category column in this example.
 
 ```{r}
+WinnersTidy %>%
+  distinct(Nationality)
 
+
+```
+
+
+
+
+
+```{r}
+WinnersTidy %>%
+  ggplot(aes(x = Year, y = Time)) +
+  geom_flag( aes(country = Nationality), size = 5) +
+  theme_minimal()
+
+```
+```{r}
+set.seed(1234)
+d <- data.frame(x=rnorm(50), y=rnorm(50), 
+                country=sample(c("ar","fr", "nz", "gb", "es", "ca", "lv", "qa"), 50, TRUE), 
+                stringsAsFactors = FALSE)
+ggplot(d, aes(x=x, y=y, country=country, size=x)) + 
+  geom_flag() + 
+  scale_country() +
+  scale_size(range = c(0, 15))
 ```
 
 

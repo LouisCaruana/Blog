@@ -1,2 +1,0 @@
-"0","winners %>%"
-"0","  filter(!grepl('Wheelchair', Category)) -> WinnersTidy"

@@ -1,0 +1,8 @@
+"0","set.seed(1234)"
+"0","d <- data.frame(x=rnorm(50), y=rnorm(50), "
+"0","                country=sample(c(""ar"",""fr"", ""nz"", ""gb"", ""es"", ""ca"", ""lv"", ""qa""), 50, TRUE), "
+"0","                stringsAsFactors = FALSE)"
+"0","ggplot(d, aes(x=x, y=y, country=country, size=x)) + "
+"0","  geom_flag() + "
+"0","  scale_country() +"
+"0","  scale_size(range = c(0, 15))"

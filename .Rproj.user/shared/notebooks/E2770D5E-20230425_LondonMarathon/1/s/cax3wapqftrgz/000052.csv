@@ -1,0 +1,7 @@
+"0","WinnersTidy %>%"
+"0","  ggplot(aes(x = Year, y = Time)) +"
+"0","  geom_flag( aes(country = Nationality), size = 5) +"
+"0","  theme_minimal()"
+"2","Error in (function (classes, fdef, mtable)  : 
+  unable to find an inherited method for function ‘grobify’ for signature ‘""NULL""’
+"
