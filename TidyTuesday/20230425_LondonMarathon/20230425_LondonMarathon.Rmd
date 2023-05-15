@@ -25,7 +25,7 @@ WinnersTidy <- winners %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Japan' , 'jp')) %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Denmark' , 'dk')) %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Kenya' , 'ke')) %>%
-   mutate(Nationality = replace(Nationality, Nationality == 'Soviet Union' , 'su')) %>%
+   mutate(Nationality = replace(Nationality, Nationality == 'Soviet Union' , 'ru')) %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Portugal' , 'pt')) %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Mexico' , 'mx')) %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Spain' , 'es')) %>%
@@ -56,19 +56,10 @@ WinnersTidy %>%
 ```{r}
 WinnersTidy %>%
   ggplot(aes(x = Year, y = Time)) +
-  geom_flag( aes(country = Nationality), size = 5) +
+  geom_flag( aes(country = Nationality), size = 7.5) +
   theme_minimal()
 
 ```
-```{r}
-set.seed(1234)
-d <- data.frame(x=rnorm(50), y=rnorm(50), 
-                country=sample(c("ar","fr", "nz", "gb", "es", "ca", "lv", "qa"), 50, TRUE), 
-                stringsAsFactors = FALSE)
-ggplot(d, aes(x=x, y=y, country=country, size=x)) + 
-  geom_flag() + 
-  scale_country() +
-  scale_size(range = c(0, 15))
-```
+
 
 
