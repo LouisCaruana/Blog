@@ -1,6 +1,10 @@
 London Marathon
 ================
 
+I started by loading in and exploring the `winners` data set. I decided
+that I wanted to highlight the nationalities in the chart, while also
+highlighting the fastest times in both categories.
+
 ``` r
 winners <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2023/2023-04-25/winners.csv')
 ```
@@ -14,6 +18,11 @@ winners <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/ti
     ## 
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+`!grepl` called within the filter function will filter out any rows that
+contain a specific string within the category column in this example. I
+also changed all countries to their ISO 3166-2 code, note lower case
+works best for use with `ggflags`
 
 ``` r
 WinnersTidy <- winners %>%
@@ -34,60 +43,62 @@ WinnersTidy <- winners %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Germany' , 'de')) %>%
    mutate(Nationality = replace(Nationality, Nationality == 'Ireland' , 'ie')) %>%
    mutate(Nationality = replace(Nationality, Nationality == 'China' , 'cn'))
-  
-
-WinnersTidy
 ```
 
-    ## # A tibble: 85 × 5
-    ##    Category  Year Athlete              Nationality Time    
-    ##    <chr>    <dbl> <chr>                <chr>       <time>  
-    ##  1 Men       1981 Dick Beardsley (Tie) us          02:11:48
-    ##  2 Men       1981 Inge Simonsen (Tie)  no          02:11:48
-    ##  3 Men       1982 Hugh Jones           gb          02:09:24
-    ##  4 Men       1983 Mike Gratton         gb          02:09:43
-    ##  5 Men       1984 Charlie Spedding     gb          02:09:57
-    ##  6 Men       1985 Steve Jones          gb          02:08:16
-    ##  7 Men       1986 Toshihiko Seko       jp          02:10:02
-    ##  8 Men       1987 Hiromi Taniguchi     jp          02:09:50
-    ##  9 Men       1988 Henrik Jørgensen     dk          02:10:20
-    ## 10 Men       1989 Douglas Wakiihuri    ke          02:09:03
-    ## # ℹ 75 more rows
-
-\#`!grepl` called within the filter function will filter out any rows
-that contain a specific string within the category column in this
-example.
+I decided to split both categories into a facet grid, as men and women
+compete separately I did not want them on the same axis. I set the
+scales to free which allows both y axis to adjust to fit each set of
+data better. After a lot of trial and error I managed to get
+`geom_flag()` working, geom flag hits an error when looking for a Soviet
+Union flag, there is a work around available for this, but in this case
+I just used the Russia flag instead.
 
 ``` r
-WinnersTidy %>%
-  distinct(Nationality)
+  ggplot(WinnersTidy, aes(x = Year, y = Time)) +
+  facet_grid(rows = vars(Category), scales = "free") +
+  geom_flag(aes(country = Nationality), size = 5) 
 ```
 
-    ## # A tibble: 16 × 1
-    ##    Nationality
-    ##    <chr>      
-    ##  1 us         
-    ##  2 no         
-    ##  3 gb         
-    ##  4 jp         
-    ##  5 dk         
-    ##  6 ke         
-    ##  7 ru         
-    ##  8 pt         
-    ##  9 mx         
-    ## 10 es         
-    ## 11 ma         
-    ## 12 et         
-    ## 13 pl         
-    ## 14 de         
-    ## 15 ie         
-    ## 16 cn
+<img src="20230425_LondonMarathon_files/figure-gfm/unnamed-chunk-3-1.png" width="672" />
+
+I have now decided that I want to label the course records with their
+name and time, so I now need to extract these from the data set and
+create a new data set RecordsTidy.
 
 ``` r
-WinnersTidy %>%
-  ggplot(aes(x = Year, y = Time)) +
-  geom_flag( aes(country = Nationality), size = 7.5) +
-  theme_minimal()
+RecordsTidy <- WinnersTidy %>% 
+   group_by(Category) %>% 
+   slice_min(order_by = Time)
+
+RecordsTidy
 ```
 
-![](20230425_LondonMarathon_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+    ## # A tibble: 2 × 5
+    ## # Groups:   Category [2]
+    ##   Category  Year Athlete         Nationality Time    
+    ##   <chr>    <dbl> <chr>           <chr>       <time>  
+    ## 1 Men       2019 Eliud Kipchoge  ke          02:02:37
+    ## 2 Women     2003 Paula Radcliffe gb          02:15:25
+
+In order to combine both data sets into the chart I needed to reorder
+some of the ggplot call to load the relevant data set into each
+respective geom. This allows me to have only the RecordsTidy subset data
+labelled rather than each flag. Also I could not manually add the text
+to the chart, im not sure if it is because of the facet or becuase of
+the time data being difficult to work with.
+
+``` r
+  ggplot() +
+  geom_flag(data = WinnersTidy,aes(x = Year, y = Time, country = Nationality), size = 5) +
+  geom_text(data = RecordsTidy, aes(x = Year, y = Time, label = Athlete),
+            hjust = +1.1, size = 3) +
+  geom_text(data = RecordsTidy, aes(x = Year, y = Time, label = Time),
+            hjust = -0.2, size = 3) +
+  facet_grid(rows = vars(Category), scales = "free")+
+  theme_minimal() +
+  labs(title = "Nationality of London Marathon Winners by Year ",
+       subtitle = "Kipchoge and Radcliffe hold the course record \nfor the Men and Women respectively",
+       caption = "Twitter: @Louis_Caruana")
+```
+
+<img src="20230425_LondonMarathon_files/figure-gfm/unnamed-chunk-5-1.png" width="672" />

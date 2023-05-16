@@ -1,0 +1,3 @@
+"0","  ggplot(WinnersTidy, aes(x = Year, y = Time)) +"
+"0","  facet_grid(rows = vars(Category), scales = ""free"") +"
+"0","  geom_flag(aes(country = Nationality), size = 5) "
